@@ -40,3 +40,21 @@ configure_elasticsearch
 
 ctx logger info "Killing Elasticsearch..."
 sudo systemctl stop elasticsearch.service
+
+# ctx logger info "Installing Elasticsearch Curator..."
+# sudo rpm --import https://packages.elasticsearch.org/GPG-KEY-elasticsearch
+# # curator --host localhost delete indices --older-than 30 --time-unit days --timestring '%Y.%m.%d'
+
+# curepo="/etc/yum.repos.d/curator.repo"
+# cat << EOF | sudo tee $curepo > /dev/null
+# "[curator-3]
+# name=CentOS/RHEL 7 repository for Elasticsearch Curator 3.x packages
+# baseurl=http://packages.elasticsearch.org/curator/3/centos/7
+# gpgcheck=1
+# gpgkey=http://packages.elasticsearch.org/GPG-KEY-elasticsearch
+# enabled=1"
+# EOF
+
+# yum_install python-elasticsearch-curator
+
+install_module "elasticsearch-curator==3.2.0"
