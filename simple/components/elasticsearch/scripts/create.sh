@@ -41,9 +41,8 @@ configure_elasticsearch
 ctx logger info "Killing Elasticsearch..."
 sudo systemctl stop elasticsearch.service
 
-# ctx logger info "Installing Elasticsearch Curator..."
+ctx logger info "Installing Elasticsearch Curator..."
 # sudo rpm --import https://packages.elasticsearch.org/GPG-KEY-elasticsearch
-# # curator --host localhost delete indices --older-than 30 --time-unit days --timestring '%Y.%m.%d'
 
 # curepo="/etc/yum.repos.d/curator.repo"
 # cat << EOF | sudo tee $curepo > /dev/null
@@ -57,4 +56,12 @@ sudo systemctl stop elasticsearch.service
 
 # yum_install python-elasticsearch-curator
 
+# yum install --downloadonly --downloaddir=/tmp python-elasticsearch-curator
+
 install_module "elasticsearch-curator==3.2.0"
+
+rotator_script=$(ctx download-resource components/scripts/elasticsearch_logsevents_index_rotator)
+
+ctx logger info "Configuring Elasticsearch Index Rotation cronjob for logstash-YYYY.mm.dd index patterns..."
+sudo mv ${rotator_script} /etc/cron.daily/elasticsearch_logsevents_index_rotator
+sudo chmod +x /etc/cron.daily/elasticsearch_logsevents_index_rotator

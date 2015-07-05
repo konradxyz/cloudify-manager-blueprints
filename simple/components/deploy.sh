@@ -1,5 +1,7 @@
 #!/bin/bash
 
+name=$1
+
 cd /tmp
 wget https://github.com/cloudify-cosmo/cloudify-nodecellar-example/archive/3.2.tar.gz -O /tmp/nc.tar.gz
 tar -xzvf /tmp/nc.tar.gz
@@ -13,6 +15,6 @@ agent_private_key_path: /root/.ssh/id_rsa
 
 cfy init
 cfy use -t 10.10.1.10
-cfy blueprints upload -b nodecellar4 -p singlehost-blueprint.yaml
-cfy deployments create -b nodecellar4 -d nodecellar4 --inputs inputs/nodecellar-singlehost.yaml
-cfy executions start -w install -d nodecellar4
+cfy blueprints upload -b $name -p singlehost-blueprint.yaml
+cfy deployments create -b $name -d $name --inputs inputs/nodecellar-singlehost.yaml
+cfy executions start -w install -d $name
