@@ -9,7 +9,7 @@ export ELASTICHSEARCH_SOURCE_URL=$(ctx node properties es_rpm_source_url)  # (e.
 
 export ELASTICSEARCH_PORT="9200"
 export ELASTICSEARCH_HOME="/opt/elasticsearch"
-export ELASTICSEARCH_LOG_PATH="/var/log/cloudify/elasticsearch"
+export ELASTICSEARCH_LOG_PATH="/var/log/elasticsearch"
 export ELASTICSEARCH_CONF_PATH="/etc/elasticsearch"
 
 
@@ -26,6 +26,25 @@ destination_es_conf_path="${ELASTICSEARCH_CONF_PATH}/elasticsearch.yml"
 ctx logger info "Deploying Elasticsearch Config file ${blueprint_es_conf_path} to ${destination_es_conf_path}..."
 tmp_es_conf_path=$(ctx download-resource ${blueprint_es_conf_path})
 sudo mv ${tmp_es_conf_path} ${destination_es_conf_path}
+
+ctx logger info "Configuring logrotate..."
+lconf="/etc/logrotate.d/elasticsearch"
+
+cat << EOF | sudo tee $lconf > /dev/null
+$LOGSTASH_LOG_PATH/*.log {
+    daily
+    rotate 7
+    size 50M
+    copytruncate
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 644 elasticsearch elasticsearch
+}
+EOF
+
+sudo chmod 644 $lconf
 
 ctx logger info "Starting Elasticsearch for configuration purposes..."
 sudo systemctl enable elasticsearch.service
