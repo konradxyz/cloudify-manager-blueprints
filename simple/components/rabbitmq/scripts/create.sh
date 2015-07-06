@@ -6,6 +6,9 @@
 export ERLANG_SOURCE_URL=$(ctx node properties erlang_rpm_source_url)  # (e.g. "http://www.rabbitmq.com/releases/erlang/erlang-17.4-1.el6.x86_64.rpm")
 export RABBITMQ_SOURCE_URL=$(ctx node properties rabbitmq_rpm_source_url)  # (e.g. "http://www.rabbitmq.com/releases/rabbitmq-server/v3.5.3/rabbitmq-server-3.5.3-1.noarch.rpm")
 
+# should be retrieved as node properties
+export RABBITMQ_USER="cloudify"
+export RABBITMQ_PASSWORD="c10udify"
 export RABBITMQ_LOG_BASE="/var/log/cloudify/rabbitmq"
 
 
@@ -51,9 +54,8 @@ ctx logger info "Enabling RabbitMQ Plugins..."
 sudo rabbitmq-plugins enable rabbitmq_management >/dev/null
 sudo rabbitmq-plugins enable rabbitmq_tracing >/dev/null
 
-# enable guest user access where cluster not on localhost
-ctx logger info "Enabling RabbitMQ user access..."
-echo "[{rabbit, [{loopback_users, []}]}]." | sudo tee --append /etc/rabbitmq/rabbitmq.config
+ctx logger info "Adding RabbitMQ User..."
+sudo rabbitmqctl add_user ${RABBITMQ_USER} ${RABBITMQ_PASSWORD}
 
 ctx logger info "Chowning RabbitMQ logs path..."
 sudo chown rabbitmq:rabbitmq ${RABBITMQ_LOG_BASE}
