@@ -84,4 +84,9 @@ sudo mv ${celery_conf} "${MANAGER_TEMPLATES_PATH}/centos-celeryd-cloudify.conf.t
 celery_init=$(download_file ${CELERY_INIT_SOURCE_URL})
 sudo mv ${celery_init} "${MANAGER_TEMPLATES_PATH}/centos-celeryd-cloudify.init.template"
 
+for i in $( ls ); do
+    $(ctx node properties agent_urls)
+    url="http://www.foo.bar/file.ext"; echo "${url##*/}"
+done
+
 sudo systemctl enable nginx.service
