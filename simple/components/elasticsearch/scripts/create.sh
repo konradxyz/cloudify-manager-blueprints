@@ -21,11 +21,13 @@ create_dir ${ELASTICSEARCH_LOG_PATH}
 
 yum_install ${ELASTICHSEARCH_SOURCE_URL}
 
-blueprint_es_conf_path="components/elasticsearch/config/elasticsearch.yml"
-destination_es_conf_path="${ELASTICSEARCH_CONF_PATH}/elasticsearch.yml"
-ctx logger info "Deploying Elasticsearch Config file ${blueprint_es_conf_path} to ${destination_es_conf_path}..."
-tmp_es_conf_path=$(ctx download-resource ${blueprint_es_conf_path})
-sudo mv ${tmp_es_conf_path} ${destination_es_conf_path}
+ctx logger info "Deploying Elasticsearch Config file..."
+tmp_es_conf_path=$(ctx download-resource "components/elasticsearch/config/elasticsearch.yml")
+sudo mv ${tmp_es_conf_path} "${ELASTICSEARCH_CONF_PATH}/elasticsearch.yml"
+
+ctx logger info "Deploying Elasticsearch Logging Configuration file..."
+tmp_es_logging_conf_path=$(ctx download-resource "components/elasticsearch/config/logging.yml")
+sudo mv ${tmp_es_logging_conf_path} "${ELASTICSEARCH_CONF_PATH}/logging.yml"
 
 ctx logger info "Configuring logrotate..."
 lconf="/etc/logrotate.d/elasticsearch"
@@ -34,7 +36,7 @@ cat << EOF | sudo tee $lconf > /dev/null
 $LOGSTASH_LOG_PATH/*.log {
     daily
     rotate 7
-    size 50M
+    size 100M
     copytruncate
     compress
     delaycompress
